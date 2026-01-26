@@ -1,4 +1,32 @@
 services:
+  crm-app:
+    build: . # Considera que o seu Dockerfile está na raiz do projeto
+    container_name: crm-backend
+    restart: on-failure
+    environment:
+
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://localhost:8081/realms/crm-realm
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://crm-auth:8080/realms/crm-realm/protocol/openid-connect/certs
+      # Conexão com o Banco (Usando o nome do serviço 'postgres')
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+
+      # Integração Keycloak (O app busca o 'crm-auth' na rede interna)
+      KEYCLOAK_REALM: crm-realm
+      KEYCLOAK_AUTH_SERVER_URL: http://crm-auth:8080
+      KEYCLOAK_CLIENT_ID: crm-backend
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET}
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+    networks:
+      - crm-network
+
   postgres:
     image: postgres:16
     container_name: crm-postgres
@@ -11,6 +39,11 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - crm-network
 
@@ -30,7 +63,7 @@ services:
       KC_HTTP_ENABLED: "true"
       KC_PROXY: edge
     ports:
-      - "8080:8080"
+      - "8081:8080"
     depends_on:
       - postgres
     networks:
@@ -41,7 +74,7 @@ services:
     container_name: crm-adminer
     restart: always
     ports:
-      - "8082:8080" # Mudamos para 8082 aqui
+      - "8082:8080"
     depends_on:
       - postgres
     networks:
