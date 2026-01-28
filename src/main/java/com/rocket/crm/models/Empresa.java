@@ -1,6 +1,7 @@
 package com.rocket.crm.models;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,6 +15,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class Empresa {
 
     @Id
@@ -26,10 +28,14 @@ public class Empresa {
     @Column(unique = true, nullable = false)
     private String empresa_CNPJ;
 
-    private String empresa_status;
+    private String empresa_status; // Ex: ATIVO, INATIVO, AGUARDANDO_PAGAMENTO
+
+    @Column(columnDefinition = "VARCHAR(50) DEFAULT 'FREE'")
     private String empresa_plano;
-    private String cakto_id;
+
+    private String cakto_id; // ID da assinatura ou do cliente na Cakto para webhooks
 
     @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime empresa_createdAt;
 }

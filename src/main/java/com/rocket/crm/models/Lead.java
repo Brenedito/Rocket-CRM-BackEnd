@@ -18,20 +18,11 @@ import java.util.UUID;
 @Getter @Setter @NoArgsConstructor
 @FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = UUID.class))
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
-public class Lead {
+public class Lead extends BaseEntity{
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID leads_id;
-
-    @Column(name = "tenant_id", nullable = false)
-    private UUID tenantId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_responsible_id")
-    private User responsible;
-
+    @Column(nullable = false)
     private String lead_name;
+
     private String lead_email;
     private String lead_phone;
     private String lead_position;
@@ -44,4 +35,8 @@ public class Lead {
 
     @CreationTimestamp
     private LocalDateTime lead_createAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_responsible_id")
+    private User responsible;
 }
