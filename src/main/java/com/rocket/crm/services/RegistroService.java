@@ -8,13 +8,15 @@ import com.rocket.crm.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
-
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
-
+import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -30,42 +32,58 @@ public class RegistroService {
     @Transactional
     public void registrarNovaEmpresa(RegistroDTO dados) {
 
-        // 1. Salvar a Empresa (Gera o Tenant ID)
+        String keycloakUserId = criarUsuarioNoKeycloak(dados);
 
-        Empresa novaEmpresa = new Empresa();
-        novaEmpresa.setEmpresa_name(dados.nomeEmpresa());
-        novaEmpresa.setEmpresa_CNPJ(dados.cnpj());
-        novaEmpresa.setEmpresa_status("ATIVO");
-        novaEmpresa.setEmpresa_plano("FREE");
-        empresaRepository.save(novaEmpresa);
+        Empresa empresa = criarEmpresa(dados);
 
-        // 2. Criar Usuário no Keycloak
+        criarUsuarioLocal(dados, keycloakUserId, empresa.getEmpresa_id());
+    }
+
+    private String criarUsuarioNoKeycloak(RegistroDTO dados) {
 
         UserRepresentation user = new UserRepresentation();
         user.setEnabled(true);
         user.setUsername(dados.email());
         user.setEmail(dados.email());
         user.setFirstName(dados.nomeAdmin());
+        user.setEmailVerified(true);
+        user.setRequiredActions(Collections.emptyList());
+        user.setCredentials(Collections.singletonList(criarSenha(dados.senha())));
 
         Response response = keycloak.realm(realm).users().create(user);
 
-        if (response.getStatus() == 201) {
-            String keycloakId = CreatedResponseUtil.getCreatedId(response);
-
-            // 3. Salvar Usuário no Banco Local vinculado ao Tenant
-
-            User usuarioLocal = new User();
-            usuarioLocal.setEmail(dados.email());
-            usuarioLocal.setKeycloakId(keycloakId);
-            usuarioLocal.setTenant_Id(novaEmpresa.getEmpresa_id());
-            usuarioRepository.save(usuarioLocal);
-
-            // 4. Definir Senha e Roles (Opcional aqui ou via convite por e-mail)
-        } else {
-
-            String errorBody = response.readEntity(String.class);
-            System.out.println("Erro do Keycloak: " + response.getStatus() + " - " + errorBody);
-            throw new RuntimeException("Falha ao criar usuário: " + response.getStatusInfo());
+        if (response.getStatus() != 201) {
+            throw new RuntimeException("Erro ao criar usuário no Keycloak. Status: " + response.getStatus());
         }
+
+        return CreatedResponseUtil.getCreatedId(response);
+    }
+
+    private CredentialRepresentation criarSenha(String senha) {
+
+        CredentialRepresentation credential = new CredentialRepresentation();
+        credential.setType(CredentialRepresentation.PASSWORD);
+        credential.setValue(senha);
+        credential.setTemporary(false);
+        return credential;
+    }
+
+    private Empresa criarEmpresa(RegistroDTO dados) {
+
+        Empresa empresa = new Empresa();
+        empresa.setEmpresa_name(dados.nomeEmpresa());
+        empresa.setEmpresa_documento(dados.documento());
+        empresa.setEmpresa_status("ATIVO");
+        empresa.setEmpresa_plano("FREE");
+        return empresaRepository.save(empresa);
+    }
+
+    private void criarUsuarioLocal(RegistroDTO dados, String keycloakId, UUID tenantId) {
+
+        User usuario = new User();
+        usuario.setEmail(dados.email());
+        usuario.setKeycloakId(keycloakId);
+        usuario.setTenant_Id(tenantId);
+        usuarioRepository.save(usuario);
     }
 }

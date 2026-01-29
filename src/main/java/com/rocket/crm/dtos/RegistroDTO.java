@@ -8,9 +8,9 @@ public record RegistroDTO(
         @NotBlank(message = "O nome da empresa é obrigatório")
         String nomeEmpresa,
 
-        @NotBlank(message = "O CNPJ é obrigatório")
-        @Size(min = 14, max = 18, message = "CNPJ inválido")
-        String cnpj,
+        @NotBlank(message = "O CPF/CNPJ é obrigatório")
+        @Size(min = 11, max = 18, message = "O documento deve ter entre 11 (CPF) e 18 (CNPJ) caracteres")
+        String documento,
 
         @NotBlank(message = "O nome do administrador é obrigatório")
         String nomeAdmin,
