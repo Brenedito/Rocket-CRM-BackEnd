@@ -26,7 +26,7 @@ public class Empresa {
     private String empresa_name;
 
     @Column(unique = true, nullable = false)
-    private String empresa_CNPJ;
+    private String empresa_documento;
 
     private String empresa_status; // Ex: ATIVO, INATIVO, AGUARDANDO_PAGAMENTO
 
