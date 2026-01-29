@@ -22,9 +22,8 @@ public class TenantInterceptor implements HandlerInterceptor {
         if (authentication instanceof JwtAuthenticationToken jwtToken) {
             String email = jwtToken.getTokenAttributes().get("email").toString();
 
-            // Busca o tenant_id vinculado a esse e-mail no seu banco local
             userRepository.findByEmail(email).ifPresent(user -> {
-
+                System.out.println("DEBUG - Interceptor setando Tenant: " + user.getTenant_Id());
                 TenantContext.setCurrentTenant(user.getTenant_Id());
             });
         }

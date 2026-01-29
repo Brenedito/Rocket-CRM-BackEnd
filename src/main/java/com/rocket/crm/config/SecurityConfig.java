@@ -16,8 +16,9 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/registro/**").permitAll()
+                        .requestMatchers("/api/registro/**").permitAll() //Remover ao Iniciar com os pagamentos
                         .requestMatchers("/public/**").permitAll()
+                        .requestMatchers("/api/webhooks/cakto").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));

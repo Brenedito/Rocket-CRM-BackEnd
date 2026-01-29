@@ -16,7 +16,7 @@ public class TenantAspect {
     @PersistenceContext
     private EntityManager entityManager;
 
-    // Antes de qualquer execução de método em Repositories, ativamos o filtro
+
     @Before("execution(* com.rocket.crm.repositories.*.*(..))")
     public void activateTenantFilter() {
         UUID tenantId = TenantContext.getCurrentTenant();
