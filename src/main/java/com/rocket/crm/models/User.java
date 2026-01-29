@@ -29,7 +29,6 @@ public class User extends BaseEntity{
     private String keycloakId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    // O segredo está aqui: apontar para a mesma coluna da BaseEntity
     @JoinColumn(name = "tenant_id", insertable = false, updatable = false)
     private Empresa empresa;
 
