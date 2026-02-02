@@ -28,12 +28,12 @@ public class Empresa {
     @Column(unique = true, nullable = false)
     private String empresa_documento;
 
-    private String empresa_status; // Ex: ATIVO, INATIVO, AGUARDANDO_PAGAMENTO
+    private String empresa_status;
 
     @Column(columnDefinition = "VARCHAR(50) DEFAULT 'FREE'")
     private String empresa_plano;
 
-    private String cakto_id; // ID da assinatura ou do cliente na Cakto para webhooks
+    private String cakto_id;
 
     @CreationTimestamp
     @Column(updatable = false)
