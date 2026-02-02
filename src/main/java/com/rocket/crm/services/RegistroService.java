@@ -1,10 +1,12 @@
 package com.rocket.crm.services;
 
+import com.rocket.crm.dtos.CaktoWebhookDTO;
 import com.rocket.crm.dtos.RegistroDTO;
 import com.rocket.crm.models.Empresa;
 import com.rocket.crm.models.User;
 import com.rocket.crm.repositories.EmpresaRepository;
 import com.rocket.crm.repositories.UserRepository;
+import com.rocket.crm.utils.PasswordGenerator;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
@@ -25,9 +27,35 @@ public class RegistroService {
     private final EmpresaRepository empresaRepository;
     private final UserRepository usuarioRepository;
     private final Keycloak keycloak;
+    private final EmpresaService empresaService;
+    private final EmailService emailService;
+    private final PasswordGenerator passwordGenerator;
 
     @Value("${keycloak.realm}")
     private String realm;
+
+    @Transactional
+    public void processarWebhookCakto(CaktoWebhookDTO payload) {
+        if ("purchase_approved".equals(payload.event())) {
+            var cliente = payload.data().customer();
+
+            String senhaAleatoria = PasswordGenerator.generate(8);
+
+            RegistroDTO novoRegistro = new RegistroDTO(
+                    cliente.nome() + " Enterprise",
+                    cliente.documento(),
+                    cliente.nome(),
+                    cliente.email(),
+                    senhaAleatoria // implementar a alteração de senha
+            );
+
+
+            emailService.enviarCredenciais(cliente.email(), cliente.nome(), senhaAleatoria); // Testar com a aplicação Real
+
+            registrarNovaEmpresa(novoRegistro);
+            empresaService.setPlanoPremium(cliente.email()); //Manter por enquanto, alterações serão pensadas no futuro
+        }
+    }
 
     @Transactional
     public void registrarNovaEmpresa(RegistroDTO dados) {
