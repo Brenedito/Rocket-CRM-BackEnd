@@ -17,6 +17,9 @@ services:
       KEYCLOAK_AUTH_SERVER_URL: http://crm-auth:8080
       KEYCLOAK_CLIENT_ID: crm-backend
       KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET}
+
+      CAKTO_WEBHOOK_SECRET: ${CAKTO_WEBHOOK_SECRET}
+      CAKTO_PRODUCT_ID: ${CAKTO_PRODUCT_ID}
     ports:
       - "8080:8080"
     depends_on:
