@@ -20,7 +20,6 @@ public class LeadService {
     @Transactional
     public Lead criarNovoLead(LeadRequestDTO dto) {
         UUID tenantId = TenantContext.getCurrentTenant();
-        System.out.println("DEBUG - Tentando salvar lead. Tenant encontrado: " + tenantId);
 
         if (tenantId == null) {
             throw new RuntimeException("ERRO CRÍTICO: TenantID não encontrado no contexto!");

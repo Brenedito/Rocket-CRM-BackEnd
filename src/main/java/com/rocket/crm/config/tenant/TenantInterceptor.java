@@ -23,7 +23,6 @@ public class TenantInterceptor implements HandlerInterceptor {
             String email = jwtToken.getTokenAttributes().get("email").toString();
 
             userRepository.findByEmail(email).ifPresent(user -> {
-                System.out.println("DEBUG - Interceptor setando Tenant: " + user.getTenant_Id());
                 TenantContext.setCurrentTenant(user.getTenant_Id());
             });
         }
@@ -32,6 +31,6 @@ public class TenantInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-        TenantContext.clear(); // Limpa para evitar vazamento de memória
+        TenantContext.clear(); 
     }
 }

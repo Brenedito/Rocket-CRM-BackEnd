@@ -33,6 +33,6 @@ public class User extends BaseEntity{
     private Empresa empresa;
 
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false) // Use o nome exato que está no Adminer
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime empresa_createdAt;
 }
