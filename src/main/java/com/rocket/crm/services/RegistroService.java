@@ -40,11 +40,10 @@ public class RegistroService {
     }
 
     private String criarUsuarioNoKeycloak(RegistroDTO dados) {
-
         UserRepresentation user = new UserRepresentation();
         user.setEnabled(true);
-        user.setUsername(dados.email());
-        user.setEmail(dados.email());
+        user.setUsername(dados.email().trim().toLowerCase());
+        user.setEmail(dados.email().trim().toLowerCase());
         user.setFirstName(dados.nomeAdmin());
         user.setEmailVerified(true);
         user.setRequiredActions(Collections.emptyList());
