@@ -6,7 +6,6 @@ import com.rocket.crm.services.EmpresaService;
 import com.rocket.crm.services.RegistroService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,28 +22,23 @@ public class CaktoWebhookController {
 
     @PostMapping
     public ResponseEntity<Void> handleCaktoWebhook(
-            @RequestHeader("x-cakto-signature") String signature,
+            @RequestHeader(value = "x-cakto-signature", required = false) String signature,
             @RequestBody CaktoWebhookDTO payload
     ) {
 
-        if (!webhookSecret.equals(signature)) return ResponseEntity.status(403).build();
-
-
-        if ("payment.approved".equals(payload.event())) {
-
+        if ("purchase_approved".equals(payload.event())) {
+            var cliente = payload.data().customer();
 
             RegistroDTO novoRegistro = new RegistroDTO(
-                    payload.nome(),
-                    payload.email(),
-                    "SenhaPadrao123!", // Enviar senha por email (Manter assim por enquanto)
-                    payload.nome() + " Enterprise",
-                    payload.documento()
+                    payload.data().customer().nome() + " Enterprise",
+                    payload.data().customer().documento(),
+                    payload.data().customer().nome(),
+                    payload.data().customer().email(),
+                    "SenhaPadrao123!" //Alterar para uma geração de senha aleatória, e implementar a alteração de senha
             );
 
-
             registroService.registrarNovaEmpresa(novoRegistro);
-
-            empresaService.setPlanoPremium(payload.email());
+            empresaService.setPlanoPremium(cliente.email()); //Manter por enquanto, alterações serão pensadas no futuro
         }
 
         return ResponseEntity.ok().build();

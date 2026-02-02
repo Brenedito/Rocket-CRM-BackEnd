@@ -1,11 +1,22 @@
 package com.rocket.crm.dtos;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public record CaktoWebhookDTO(
         String event,
-        @JsonProperty("customer_name") String nome,
-        @JsonProperty("customer_email") String email,
-        @JsonProperty("customer_document") String documento, // CPF ou CNPJ que validamos antes
-        @JsonProperty("payment_status") String status
-) {}
+        CaktoDataDTO data
+) {
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record CaktoDataDTO(
+            CaktoCustomerDTO customer
+    ) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record CaktoCustomerDTO(
+            @JsonProperty("name") String nome,
+            @JsonProperty("email") String email,
+            @JsonProperty("docNumber") String documento
+    ) {}
+}
