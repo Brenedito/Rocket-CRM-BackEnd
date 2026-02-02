@@ -20,6 +20,9 @@ services:
 
       CAKTO_WEBHOOK_SECRET: ${CAKTO_WEBHOOK_SECRET}
       CAKTO_PRODUCT_ID: ${CAKTO_PRODUCT_ID}
+
+      MAIL_USER: ${MAIL_USER}
+      MAIL_PASS: ${MAIL_PASS}
     ports:
       - "8080:8080"
     depends_on:
