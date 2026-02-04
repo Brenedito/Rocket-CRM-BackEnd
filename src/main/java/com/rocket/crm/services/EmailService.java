@@ -1,9 +1,9 @@
 package com.rocket.crm.services;
 
+import com.rocket.crm.exceptions.EmailSendException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -47,7 +47,7 @@ public class EmailService {
             helper.setText(htmlContent, true);
             mailSender.send(message);
         } catch (MessagingException e) {
-            throw new RuntimeException("Falha ao descriptografar envio de e-mail: " + e.getMessage());
+            throw new EmailSendException("Falha ao enviar e-mail para " + email, e);
         }
     }
 }
