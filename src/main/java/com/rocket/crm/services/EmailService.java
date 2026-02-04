@@ -18,7 +18,7 @@ public class EmailService {
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             helper.setTo(email);
-            helper.setSubject("Acesso Garantido // RocketCompany");
+            helper.setSubject("Acesso Concedido // RocketCompany");
 
             String htmlContent = """
             <div style="background-color: #020617; color: #f1f5f9; font-family: 'Montserrat', sans-serif; padding: 40px; border: 1px solid #1e293b; max-width: 600px;">
