@@ -23,7 +23,7 @@ public class TenantInterceptor implements HandlerInterceptor {
             String email = jwtToken.getTokenAttributes().get("email").toString();
 
             userRepository.findByEmail(email).ifPresent(user -> {
-                TenantContext.setCurrentTenant(user.getTenant_Id());
+                TenantContext.setCurrentTenant(user.getTenant_id());
             });
         }
         return true;

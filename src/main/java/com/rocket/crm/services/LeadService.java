@@ -35,7 +35,7 @@ public class LeadService {
         lead.setLead_desc(dto.lead_desc());
 
 
-        lead.setTenant_Id(TenantContext.getCurrentTenant());
+        lead.setTenant_id(TenantContext.getCurrentTenant());
 
         return leadRepository.save(lead);
     }
