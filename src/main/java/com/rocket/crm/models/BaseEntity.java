@@ -22,5 +22,5 @@ public abstract class BaseEntity {
 
 
     @Column(name = "tenant_id", nullable = false, updatable = false)
-    private UUID tenant_Id;
+    private UUID tenant_id;
 }
