@@ -34,5 +34,5 @@ public class User extends BaseEntity{
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
-    private LocalDateTime empresa_createdAt;
+    private LocalDateTime created_At;
 }
