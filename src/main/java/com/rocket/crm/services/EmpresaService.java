@@ -37,28 +37,42 @@ public class EmpresaService {
 
     }
 
-    public void atualizarAssinatura(String email, int dias) {
+    @Transactional
+    public void atualizarAssinatura(String email, int dias, String novoCaktoId) {
         Empresa empresa = empresaRepository.findByEmailUsuario(email)
                 .orElseThrow(() -> new EmpresaNotFoundException("Empresa não encontrada para o e-mail: " + email));
 
-        // Se a empresa já expirou, conta a partir de hoje. Se não, soma na data atual.
-        LocalDateTime base = (empresa.getDataExpiracao() == null || empresa.getDataExpiracao().isBefore(LocalDateTime.now())) ? LocalDateTime.now() : empresa.getDataExpiracao();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsuarioNotFoundException("Usuário não encontrado"));
+
+        // Define a base: se já expirou, usa agora; se não, soma no prazo restante
+        LocalDateTime base = (empresa.getDataExpiracao() == null || empresa.getDataExpiracao().isBefore(LocalDateTime.now()))
+                ? LocalDateTime.now() : empresa.getDataExpiracao();
 
         empresa.setDataExpiracao(base.plusDays(dias));
         empresa.setEmpresa_plano("PREMIUM");
+        empresa.setEmpresa_status("ATIVO");
+        keycloakService.adicionarRole(user.getKeycloakId(),"ROLE_PREMIUM");
+        keycloakService.adicionarRole(user.getKeycloakId(),"ROLE_GERENTE");
+        empresa.setCakto_id(novoCaktoId);
+
         empresaRepository.save(empresa);
     }
 
+    @Transactional
     public void removerAcessoPremium(String email) {
         Empresa empresa = empresaRepository.findByEmailUsuario(email)
-                .orElseThrow(() -> new EmpresaNotFoundException("Empresa não encontrada para o e-mail: " + email));
-        empresa.setEmpresa_plano("FREE");
-        empresaRepository.save(empresa);
+                .orElseThrow(() -> new EmpresaNotFoundException("Empresa não encontrada"));
 
+        empresa.setEmpresa_plano("FREE");
+        empresa.setEmpresa_status("INATIVO");
+        empresa.setDataExpiracao(LocalDateTime.now().minusDays(1));
+        empresaRepository.save(empresa);
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsuarioNotFoundException("Usuário não encontrado"));
 
         keycloakService.removerRole(user.getKeycloakId(), "ROLE_PREMIUM");
+        keycloakService.removerRole(user.getKeycloakId(), "ROLE_GERENTE");
     }
 }
