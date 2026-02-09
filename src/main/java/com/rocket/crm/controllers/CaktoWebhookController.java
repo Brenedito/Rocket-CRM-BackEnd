@@ -1,9 +1,7 @@
 package com.rocket.crm.controllers;
 
 import com.rocket.crm.dtos.CaktoWebhookDTO;
-import com.rocket.crm.dtos.RegistroDTO;
-import com.rocket.crm.services.EmpresaService;
-import com.rocket.crm.services.RegistroService;
+import com.rocket.crm.services.WebhookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class CaktoWebhookController {
 
-    private final RegistroService registroService;
+    private final WebhookService webhookService;
 
     @Value("${cakto.webhook-secret}")
     private String webhookSecret;
@@ -24,7 +22,7 @@ public class CaktoWebhookController {
             @RequestHeader(value = "x-cakto-signature", required = false) String signature,
             @RequestBody CaktoWebhookDTO payload
     ) {
-        registroService.processarWebhookCakto(payload);
+        webhookService.processarWebhookCakto(payload);
         return ResponseEntity.ok().build();
     }
 }

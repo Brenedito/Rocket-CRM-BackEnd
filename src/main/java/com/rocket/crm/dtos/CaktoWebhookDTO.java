@@ -10,6 +10,7 @@ public record CaktoWebhookDTO(
 ) {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record CaktoDataDTO(
+            String id,
             CaktoCustomerDTO customer
     ) {}
 
