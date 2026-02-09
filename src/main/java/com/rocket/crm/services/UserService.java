@@ -53,6 +53,36 @@ public class UserService {
         userRepository.save(novoUser);
     }
 
+    @Transactional
+    public void atualizarColaborador(UUID id, ColaboradorDTO dados, User gerenteLogado) {
+        User usuario = userRepository.findById(id)
+                .filter(u -> u.getTenant_id().equals(gerenteLogado.getTenant_id())) // Garante isolamento
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado no seu time"));
+
+        // Atualiza no Banco Local
+        usuario.setEmail(dados.email().trim().toLowerCase());
+        userRepository.save(usuario);
+
+        // Atualiza no Keycloak (Nome e Email)
+        UserRepresentation ur = keycloak.realm(realm).users().get(usuario.getKeycloakId()).toRepresentation();
+        ur.setEmail(dados.email());
+        ur.setFirstName(dados.nome());
+        keycloak.realm(realm).users().get(usuario.getKeycloakId()).update(ur);
+    }
+
+    @Transactional
+    public void deletarColaborador(UUID id, User gerenteLogado) {
+        User usuario = userRepository.findById(id)
+                .filter(u -> u.getTenant_id().equals(gerenteLogado.getTenant_id()))
+                .orElseThrow(() -> new RuntimeException("Ação não permitida"));
+
+        // Remove do Keycloak primeiro
+        keycloak.realm(realm).users().get(usuario.getKeycloakId()).remove();
+
+        // Remove do Banco Local
+        userRepository.delete(usuario);
+    }
+
     private String provisionarUsuarioKeycloak(String email, String nome, String senha) {
         UserRepresentation user = new UserRepresentation();
         user.setEnabled(true);
