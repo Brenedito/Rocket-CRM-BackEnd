@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/leads")
@@ -20,12 +21,22 @@ public class LeadController {
 
     @PostMapping
     public ResponseEntity<Lead> criar(@Valid @RequestBody LeadRequestDTO dto) {
-        Lead novoLead = leadService.criarNovoLead(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(novoLead);
+        return ResponseEntity.status(HttpStatus.CREATED).body(leadService.criarNovoLead(dto));
     }
 
     @GetMapping
     public ResponseEntity<List<Lead>> listar() {
         return ResponseEntity.ok(leadService.listarLeadsDaEmpresa());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Lead> atualizar(@PathVariable UUID id, @Valid @RequestBody LeadRequestDTO dto) {
+        return ResponseEntity.ok(leadService.atualizarLead(id, dto));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable UUID id) {
+        leadService.deletarLead(id);
+        return ResponseEntity.noContent().build();
     }
 }
