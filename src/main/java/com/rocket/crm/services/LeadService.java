@@ -2,6 +2,7 @@ package com.rocket.crm.services;
 
 import com.rocket.crm.config.tenant.TenantContext;
 import com.rocket.crm.dtos.LeadRequestDTO;
+import com.rocket.crm.dtos.LeadUpdateDTO;
 import com.rocket.crm.models.Lead;
 import com.rocket.crm.enums.LeadStatus;
 import com.rocket.crm.repositories.LeadRepository;
@@ -51,23 +52,24 @@ public class LeadService {
     }
 
     @Transactional
-    public Lead atualizarLead(UUID id, LeadRequestDTO dto) {
+    public Lead atualizarLead(UUID id, LeadUpdateDTO dto) {
         Lead lead = leadRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Lead não encontrado"));
 
-        lead.setLead_name(dto.lead_name());
-        lead.setLead_email(dto.lead_email());
-        lead.setLead_phone(dto.lead_phone());
-        lead.setLead_position(dto.lead_position());
-        lead.setLead_value(dto.lead_value());
-        lead.setLead_origin(dto.lead_origin());
-        lead.setLead_desc(dto.lead_desc());
+        // Only update fields that are present (non-null) in the incoming DTO
+        if (dto.lead_name() != null) lead.setLead_name(dto.lead_name());
+        if (dto.lead_email() != null) lead.setLead_email(dto.lead_email());
+        if (dto.lead_phone() != null) lead.setLead_phone(dto.lead_phone());
+        if (dto.lead_position() != null) lead.setLead_position(dto.lead_position());
+        if (dto.lead_value() != null) lead.setLead_value(dto.lead_value());
+        if (dto.lead_origin() != null) lead.setLead_origin(dto.lead_origin());
+        if (dto.lead_desc() != null) lead.setLead_desc(dto.lead_desc());
 
         if (dto.lead_status() != null && !dto.lead_status().isBlank()) {
             try {
                 lead.setLead_status(LeadStatus.valueOf(dto.lead_status().trim().toUpperCase()));
             } catch (IllegalArgumentException ex) {
-
+                // ignore invalid status
             }
         }
 

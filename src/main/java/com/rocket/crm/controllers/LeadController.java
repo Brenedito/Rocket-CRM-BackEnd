@@ -1,6 +1,7 @@
 package com.rocket.crm.controllers;
 
 import com.rocket.crm.dtos.LeadRequestDTO;
+import com.rocket.crm.dtos.LeadUpdateDTO;
 import com.rocket.crm.models.Lead;
 import com.rocket.crm.services.LeadService;
 import jakarta.validation.Valid;
@@ -30,7 +31,7 @@ public class LeadController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Lead> atualizar(@PathVariable UUID id, @Valid @RequestBody LeadRequestDTO dto) {
+    public ResponseEntity<Lead> atualizar(@PathVariable UUID id, @RequestBody LeadUpdateDTO dto) {
         return ResponseEntity.ok(leadService.atualizarLead(id, dto));
     }
 
