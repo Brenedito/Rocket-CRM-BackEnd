@@ -13,6 +13,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.rocket.crm.enums.LeadStatus;
+
 @Entity
 @Table(name = "Leads_Table")
 @Getter @Setter @NoArgsConstructor
@@ -39,4 +41,9 @@ public class Lead extends BaseEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_responsible_id")
     private User responsible;
+
+    // New field to track lead status for kanban
+    @Enumerated(EnumType.STRING)
+    @Column(name = "lead_status", nullable = false, length = 50, columnDefinition = "varchar(50) default 'NOVO'")
+    private LeadStatus lead_status = LeadStatus.NOVO;
 }

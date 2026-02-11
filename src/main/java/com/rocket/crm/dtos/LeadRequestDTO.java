@@ -16,5 +16,6 @@ public record LeadRequestDTO(
         BigDecimal lead_value,
         String lead_origin,
         String lead_desc,
-        String responsibleId
+        String responsibleId,
+        String lead_status
 ) {}

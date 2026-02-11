@@ -3,6 +3,7 @@ package com.rocket.crm.services;
 import com.rocket.crm.config.tenant.TenantContext;
 import com.rocket.crm.dtos.LeadRequestDTO;
 import com.rocket.crm.models.Lead;
+import com.rocket.crm.enums.LeadStatus;
 import com.rocket.crm.repositories.LeadRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,15 @@ public class LeadService {
         lead.setLead_origin(dto.lead_origin());
         lead.setLead_desc(dto.lead_desc());
 
+        // Set status from DTO if provided, otherwise default to NEW
+        if (dto.lead_status() != null && !dto.lead_status().isBlank()) {
+            try {
+                lead.setLead_status(LeadStatus.valueOf(dto.lead_status().trim().toUpperCase()));
+            } catch (IllegalArgumentException ex) {
+                // invalid status provided; keep default NEW
+                lead.setLead_status(LeadStatus.NOVO);
+            }
+        }
 
         lead.setTenant_id(TenantContext.getCurrentTenant());
 
@@ -52,6 +62,14 @@ public class LeadService {
         lead.setLead_value(dto.lead_value());
         lead.setLead_origin(dto.lead_origin());
         lead.setLead_desc(dto.lead_desc());
+
+        if (dto.lead_status() != null && !dto.lead_status().isBlank()) {
+            try {
+                lead.setLead_status(LeadStatus.valueOf(dto.lead_status().trim().toUpperCase()));
+            } catch (IllegalArgumentException ex) {
+
+            }
+        }
 
         return leadRepository.save(lead);
     }
