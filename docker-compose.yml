@@ -5,19 +5,19 @@ services:
     restart: on-failure
     environment:
 
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://crm-auth:8080/realms/crm-realm
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://crm-auth:8080/realms/crm-realm/protocol/openid-connect/certs
-      # Conexão com o Banco (Usando o nome do serviço 'postgres')
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: ${KC_EXTERNAL_URL}/realms/crm-realm
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: ${KC_INTERNAL_URL}/realms/crm-realm/protocol/openid-connect/certs
+
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
 
       # Integração Keycloak (O app busca o 'crm-auth' na rede interna)
       KEYCLOAK_REALM: crm-realm
-      KEYCLOAK_AUTH_SERVER_URL: http://crm-auth:8080
+
       KEYCLOAK_CLIENT_ID: crm-backend
       KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET}
-
+      KEYCLOAK_AUTH_SERVER_URL: ${KC_INTERNAL_URL}
       CAKTO_WEBHOOK_SECRET: ${CAKTO_WEBHOOK_SECRET}
       CAKTO_PRODUCT_ID: ${CAKTO_PRODUCT_ID}
 
