@@ -40,7 +40,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000", "https://salescrm.rocketcompanny.com.br")); // Origem do seu React
+        configuration.setAllowedOrigins(List.of("http://localhost:3000", "https://salescrm.rocketcompanny.com.br"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of(
                 "Authorization",
@@ -49,7 +49,11 @@ public class SecurityConfig {
                 "Origin",
                 "X-Requested-With"
         ));
+
+        // ADICIONE ESTAS LINHAS:
+        configuration.setExposedHeaders(List.of("Authorization")); // Permite que o JS leia o header
         configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L); // Cache do preflight por 1 hora
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
