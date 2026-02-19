@@ -1,6 +1,6 @@
 services:
   crm-app:
-    build: . # Considera que o seu Dockerfile está na raiz do projeto
+    build: .
     container_name: crm-backend
     restart: on-failure
     environment:
@@ -8,19 +8,20 @@ services:
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: ${KC_EXTERNAL_URL}/realms/crm-realm
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: ${KC_INTERNAL_URL}/realms/crm-realm/protocol/openid-connect/certs
 
+
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
 
-      # Integração Keycloak (O app busca o 'crm-auth' na rede interna)
       KEYCLOAK_REALM: crm-realm
-
       KEYCLOAK_CLIENT_ID: crm-backend
       KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET}
-      KEYCLOAK_AUTH_SERVER_URL: ${KC_INTERNAL_URL}
+
+
+      KEYCLOAK_AUTH_SERVER_URL: http://keycloak:8080
+
       CAKTO_WEBHOOK_SECRET: ${CAKTO_WEBHOOK_SECRET}
       CAKTO_PRODUCT_ID: ${CAKTO_PRODUCT_ID}
-
       MAIL_USER: ${MAIL_USER}
       MAIL_PASS: ${MAIL_PASS}
     ports:
@@ -65,6 +66,7 @@ services:
       KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
       KEYCLOAK_ADMIN: ${KC_ADMIN_USER}
       KEYCLOAK_ADMIN_PASSWORD: ${KC_ADMIN_PASSWORD}
+      KC_HOSTNAME_URL: ${KC_EXTERNAL_URL}
       KC_HOSTNAME_STRICT: "false"
       KC_HTTP_ENABLED: "true"
       KC_PROXY: edge

@@ -1,4 +1,4 @@
-package com.rocket.crm.config;
+package com.rocket.crm.config.security;
 
 import com.rocket.crm.config.tenant.TenantInterceptor;
 import lombok.RequiredArgsConstructor;
