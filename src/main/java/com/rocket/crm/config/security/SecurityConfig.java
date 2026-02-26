@@ -27,8 +27,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/registro/**").permitAll()
-                        .requestMatchers("/public/**").permitAll()
+//                        .requestMatchers("/api/registro/**").permitAll()
                         .requestMatchers("/api/webhooks/cakto").permitAll()
                         .anyRequest().authenticated()
                 )

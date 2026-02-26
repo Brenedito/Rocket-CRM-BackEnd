@@ -8,6 +8,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 @RequiredArgsConstructor
 public class UserContext {
@@ -26,5 +28,14 @@ public class UserContext {
 
         return userRepository.findByKeycloakId(keycloakId)
                 .orElseThrow(() -> new RuntimeException("Usuário logado não encontrado no banco local"));
+    }
+
+    /**
+     * Retorna o tenant_id do usuário logado
+     * Útil para filtrar dados por tenant sem precisar carregar a entidade User completa
+     */
+    public UUID getTenantId() {
+        User usuario = getUsuarioLogado();
+        return usuario != null ? usuario.getTenant_id() : null;
     }
 }
