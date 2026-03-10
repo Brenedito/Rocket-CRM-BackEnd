@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -67,7 +68,11 @@ public class LeadService {
 
         if (dto.lead_status() != null && !dto.lead_status().isBlank()) {
             try {
-                lead.setLead_status(LeadStatus.valueOf(dto.lead_status().trim().toUpperCase()));
+                LeadStatus newStatus = LeadStatus.valueOf(dto.lead_status().trim().toUpperCase());
+                if (newStatus != lead.getLead_status()) {
+                    lead.setLead_status(newStatus);
+                    lead.setLead_lastUpdate(LocalDateTime.now());
+                }
             } catch (IllegalArgumentException ex) {
                 // ignore invalid status
             }

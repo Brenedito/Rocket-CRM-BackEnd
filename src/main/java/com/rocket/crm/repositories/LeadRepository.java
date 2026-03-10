@@ -1,7 +1,6 @@
 package com.rocket.crm.repositories;
 
 import com.rocket.crm.models.Lead;
-import com.rocket.crm.enums.LeadStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,7 +22,7 @@ public interface LeadRepository extends JpaRepository<Lead, UUID> {
     long countTotalLeads(@Param("tenantId") UUID tenantId);
 
     /**
-     * Retorna o total de leads criados dentro de um período específico
+     * Retorna o total de leads atualizados dentro de um período específico
      */
     @Query("SELECT COUNT(l) FROM Lead l WHERE l.tenant_id = :tenantId AND l.lead_createAt BETWEEN :startDate AND :endDate")
     long countLeadsByPeriod(@Param("tenantId") UUID tenantId,
@@ -31,25 +30,25 @@ public interface LeadRepository extends JpaRepository<Lead, UUID> {
                             @Param("endDate") LocalDateTime endDate);
 
     /**
-     * Retorna a soma de todos os valores dos leads no período
+     * Retorna a soma de todos os valores dos leads no período, exceto os perdidos
      */
-    @Query("SELECT COALESCE(SUM(l.lead_value), 0) FROM Lead l WHERE l.tenant_id = :tenantId AND l.lead_createAt BETWEEN :startDate AND :endDate")
+    @Query("SELECT COALESCE(SUM(l.lead_value), 0) FROM Lead l WHERE l.tenant_id = :tenantId AND l.lead_createAt BETWEEN :startDate AND :endDate AND l.lead_status <> 'PERDIDO'")
     BigDecimal sumLeadValueByPeriod(@Param("tenantId") UUID tenantId,
                                     @Param("startDate") LocalDateTime startDate,
                                     @Param("endDate") LocalDateTime endDate);
 
     /**
-     * Retorna a soma dos valores apenas dos leads com status GANHO no período
+     * Retorna a soma dos valores apenas dos leads com status GANHO atualizados no período
      */
-    @Query("SELECT COALESCE(SUM(l.lead_value), 0) FROM Lead l WHERE l.tenant_id = :tenantId AND l.lead_status = 'GANHO' AND l.lead_createAt BETWEEN :startDate AND :endDate")
+    @Query("SELECT COALESCE(SUM(l.lead_value), 0) FROM Lead l WHERE l.tenant_id = :tenantId AND l.lead_status = 'GANHO' AND l.lead_lastUpdate BETWEEN :startDate AND :endDate")
     BigDecimal sumWonLeadValueByPeriod(@Param("tenantId") UUID tenantId,
                                        @Param("startDate") LocalDateTime startDate,
                                        @Param("endDate") LocalDateTime endDate);
 
     /**
-     * Retorna a contagem de leads com status GANHO no período
+     * Retorna a contagem de leads com status GANHO atualizados no período
      */
-    @Query("SELECT COUNT(l) FROM Lead l WHERE l.tenant_id = :tenantId AND l.lead_status = 'GANHO' AND l.lead_createAt BETWEEN :startDate AND :endDate")
+    @Query("SELECT COUNT(l) FROM Lead l WHERE l.tenant_id = :tenantId AND l.lead_status = 'GANHO' AND l.lead_lastUpdate BETWEEN :startDate AND :endDate")
     long countWonLeadsByPeriod(@Param("tenantId") UUID tenantId,
                                @Param("startDate") LocalDateTime startDate,
                                @Param("endDate") LocalDateTime endDate);

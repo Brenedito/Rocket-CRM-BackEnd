@@ -34,6 +34,7 @@ public class Lead extends BaseEntity{
 
     private String lead_origin;
     private String lead_desc;
+    private LocalDateTime lead_lastUpdate;
 
     @CreationTimestamp
     private LocalDateTime lead_createAt;
