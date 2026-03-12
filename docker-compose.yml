@@ -2,30 +2,22 @@ services:
   crm-app:
     build: .
     container_name: crm-backend
-    restart: on-failure
+    restart: always # Alterado para always para garantir recuperação automática
     environment:
-
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: ${KC_EXTERNAL_URL}/realms/crm-realm
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: ${KC_INTERNAL_URL}/realms/crm-realm/protocol/openid-connect/certs
-
-
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
-
       KEYCLOAK_REALM: crm-realm
       KEYCLOAK_CLIENT_ID: crm-backend
       KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET}
-
-
       KEYCLOAK_AUTH_SERVER_URL: http://keycloak:8080
-
       CAKTO_WEBHOOK_SECRET: ${CAKTO_WEBHOOK_SECRET}
       CAKTO_PRODUCT_ID: ${CAKTO_PRODUCT_ID}
       MAIL_USER: ${MAIL_USER}
       MAIL_PASS: ${MAIL_PASS}
-    ports:
-      - "2000:2000"
+    # REMOVIDO: portas expostas. O Coolify usa o domínio para chegar aqui.
     depends_on:
       postgres:
         condition: service_healthy
@@ -43,7 +35,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "2001:5432"
+      # Agora o banco só é acessível de dentro da VPS (via tunel SSH se precisar)
+      - "127.0.0.1:2001:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -70,10 +63,7 @@ services:
       KC_HOSTNAME_STRICT: "false"
       KC_HTTP_ENABLED: "true"
       KC_PROXY: edge
-    ports:
-      - "2002:8080"
-    depends_on:
-      - postgres
+    # O Coolify usa o domínio configurado para o Keycloak, não precisa expor a 2002
     networks:
       - crm-network
 
@@ -81,10 +71,7 @@ services:
     image: adminer
     container_name: crm-adminer
     restart: always
-    ports:
-      - "2003:8080"
-    depends_on:
-      - postgres
+    # O Adminer também deve ser acessado pelo domínio gerado pelo Coolify
     networks:
       - crm-network
 
