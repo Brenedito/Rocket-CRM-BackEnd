@@ -23,10 +23,12 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.crm-app.rule=Host(`api-crm.rocketcompanny.com.br`)"
       - "traefik.http.services.crm-app.loadbalancer.server.port=2000"
-    # REMOVIDO: portas expostas. O Coolify usa o domínio para chegar aqui.
+      # Adicione estes dois para garantir o redirecionamento HTTPS correto:
+      - "traefik.http.routers.crm-app.entrypoints=websecure"
+      - "traefik.http.routers.crm-app.tls=true"
 
-    ports:
-      - "127.0.0.1:2000:2000"
+#    ports:
+#      - "127.0.0.1:2000:2000"
 
     depends_on:
       postgres:
