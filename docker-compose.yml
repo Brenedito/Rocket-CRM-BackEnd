@@ -24,6 +24,10 @@ services:
       - "traefik.http.routers.crm-app.rule=Host(`api-crm.rocketcompanny.com.br`)"
       - "traefik.http.services.crm-app.loadbalancer.server.port=2000"
     # REMOVIDO: portas expostas. O Coolify usa o domínio para chegar aqui.
+
+    ports:
+      - "127.0.0.1:2000:2000"
+
     depends_on:
       postgres:
         condition: service_healthy
@@ -69,7 +73,9 @@ services:
       KC_HOSTNAME_STRICT: "false"
       KC_HTTP_ENABLED: "true"
       KC_PROXY: edge
-    # O Coolify usa o domínio configurado para o Keycloak, não precisa expor a 2002
+
+    ports:
+      - "127.0.0.1:2002:8080"
     networks:
       - crm-network
 
